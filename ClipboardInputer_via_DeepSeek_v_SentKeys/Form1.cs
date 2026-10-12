@@ -17,6 +17,9 @@ public partial class Form1 : Form
             this.Load += async (s, e) => await ExecuteScenarioAsync();
         }
 
+        // Prevent my window from getting activation and focus when shown
+        protected override bool ShowWithoutActivation => true;  
+
         private async Task ExecuteScenarioAsync()
         {
             // === Шаг 1: Считывание данных из буфера обмена ===
