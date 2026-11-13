@@ -12,13 +12,23 @@ public partial class Form1 : Form
     private const string SendKeysSpecialChars = "+^%~(){}[]";
     
     private const int MillisecondsDelayBeforeExitOnError = 3000;
-
+    private bool abortPressed = false;
 
     public Form1()
     {
         InitializeComponent();
+
+        KeysInterceptor.OnKeyPressed += KeysInterceptor_OnKeyPressed;
         
         this.Load += async (s, e) => await ExecuteScenarioAsync();
+    }
+
+    private void KeysInterceptor_OnKeyPressed(int obj)
+    {
+        if (obj == (int)Keys.Escape)
+        {
+            abortPressed = true;
+        }
     }
 
     // Prevent my window from getting activation and focus when shown
@@ -26,6 +36,12 @@ public partial class Form1 : Form
 
     private async Task ExecuteScenarioAsync()
     {
+        if(abortPressed)
+        {
+            LogAbortPressed();
+            return;
+        }
+
         // === Шаг 1: Считывание данных из буфера обмена ===
         Log("Чтение данных из буфера обмена...");
 
@@ -59,6 +75,12 @@ public partial class Form1 : Form
         string normalized = clipboardText.Replace("\r\n", "\n").Replace("\r", "\n");
 
         var filtered = new StringBuilder();
+
+        if (abortPressed)
+        {
+            LogAbortPressed();
+            return;
+        }
 
         foreach (char c in normalized)
         {
@@ -115,9 +137,30 @@ public partial class Form1 : Form
         Log("Подготовка к эмуляции ввода через 1 секунду...");
         await Task.Delay(1000);
 
+        if (abortPressed)
+        {
+            LogAbortPressed();
+            return;
+        }
+
         try
         {
-            SendKeys.SendWait(keysToSend);
+            var endOfLineMarker = "{ENTER}";
+
+            var linesToSend = keysToSend.Split(endOfLineMarker, StringSplitOptions.None)
+                .Select(l => l+endOfLineMarker);
+
+            foreach (var line in linesToSend) 
+            {
+                if (abortPressed)
+                {
+                    LogAbortPressed();
+                    return;
+                }
+
+                SendKeys.SendWait(line);
+            }
+
             Log("Эмуляция ввода завершена.");
         }
         catch (Exception ex)
@@ -169,6 +212,12 @@ public partial class Form1 : Form
             '\u007f' => "{DELETE}",  // DEL
             _ => null            // остальные управляющие — пропускаем
         };
+    }
+
+    protected void LogAbortPressed()
+    {
+        Log("Нажата кнопка отмены (Esc)"+Environment.NewLine+
+            "Печать прервана");
     }
 
     private void Log(string message)
