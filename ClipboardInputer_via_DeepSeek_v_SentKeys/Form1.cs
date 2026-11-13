@@ -39,6 +39,8 @@ public partial class Form1 : Form
         if(abortPressed)
         {
             LogAbortPressed();
+            await Task.Delay(MillisecondsDelayBeforeExitOnError);
+            Application.Exit();
             return;
         }
 
@@ -79,6 +81,8 @@ public partial class Form1 : Form
         if (abortPressed)
         {
             LogAbortPressed();
+            await Task.Delay(MillisecondsDelayBeforeExitOnError);
+            Application.Exit();
             return;
         }
 
@@ -140,6 +144,8 @@ public partial class Form1 : Form
         if (abortPressed)
         {
             LogAbortPressed();
+            await Task.Delay(MillisecondsDelayBeforeExitOnError);
+            Application.Exit();
             return;
         }
 
@@ -155,6 +161,8 @@ public partial class Form1 : Form
                 if (abortPressed)
                 {
                     LogAbortPressed();
+                    await Task.Delay(MillisecondsDelayBeforeExitOnError);
+                    Application.Exit();
                     return;
                 }
 
