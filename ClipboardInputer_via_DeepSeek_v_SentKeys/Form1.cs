@@ -153,8 +153,12 @@ public partial class Form1 : Form
         {
             var endOfLineMarker = "{ENTER}";
 
-            var linesToSend = keysToSend.Split(endOfLineMarker, StringSplitOptions.None)
-                .Select(l => l+endOfLineMarker);
+            var linesToSend = keysToSend.Split(endOfLineMarker, StringSplitOptions.None);
+
+            for (int i = 0; i < linesToSend.Length-1 /*исключаем последний элемент*/; i++)
+            {
+                linesToSend[i] = linesToSend[i] + endOfLineMarker;
+            }
 
             foreach (var line in linesToSend) 
             {
